@@ -181,18 +181,35 @@ All database changes are managed through migration files.
 Install:
 
 - Docker Desktop
+- JDK 21 (only needed if you want to run Gradle tasks outside Docker)
+
+---
+
+## Configure Environment
+
+Copy the example env file and adjust values if needed (defaults work out of the box):
+
+```bash
+cp .env.example .env
+```
 
 ---
 
 ## Start Application
 
-Start the complete environment:
+Start the complete environment (app + PostgreSQL):
 
 ```bash
 docker compose up
 ```
 
-or for a fresh build:
+Start in the background (detached):
+
+```bash
+docker compose up -d
+```
+
+Force a fresh image build, e.g. after dependency or code changes:
 
 ```bash
 docker compose up --build
@@ -200,10 +217,71 @@ docker compose up --build
 
 ---
 
+## Check Status & Logs
+
+```bash
+docker compose ps
+docker compose logs -f app
+docker compose logs -f db
+```
+
+---
+
 ## Stop Application
 
-Stops the complete environment:
+Stop containers but keep the database volume:
+
+```bash
+docker compose down
+```
+
+Stop containers and wipe the database volume (clean slate):
 
 ```bash
 docker compose down -v
+```
+
+---
+
+## Access the Database
+
+Open a `psql` shell inside the running `db` container:
+
+```bash
+docker compose exec db psql -U taskflow -d taskflow
+```
+
+---
+
+## Run Tests
+
+Tests use [Testcontainers](https://testcontainers.com) to spin up a real PostgreSQL instance automatically — Docker must be running, but the containers do **not** need to be started via `docker compose` first:
+
+```bash
+./gradlew test
+```
+
+---
+
+## Run/Build Without Docker Compose
+
+Useful while iterating on code without rebuilding the image each time.
+
+Start only the database:
+
+```bash
+docker compose up db -d
+```
+
+Run the app against it directly via Gradle (override `DB_HOST` since the app now runs on the host, not inside the Docker network):
+
+```bash
+DB_HOST=localhost ./gradlew bootRun
+```
+
+Build a runnable jar:
+
+```bash
+./gradlew bootJar
+java -jar build/libs/taskflow-0.0.1-SNAPSHOT.jar
 ```
