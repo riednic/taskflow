@@ -1,0 +1,10 @@
+.git
+.gradle
+.idea
+build
+out
+*.iml
+HELP.md
+README.md
+CHALLENGE.md
+.env
