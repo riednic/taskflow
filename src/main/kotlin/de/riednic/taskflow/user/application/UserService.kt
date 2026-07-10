@@ -1,9 +1,9 @@
 package de.riednic.taskflow.user.application
 
 import de.riednic.taskflow.user.controller.CreateUserRequest
-import de.riednic.taskflow.user.domain.UserAlreadyExistsException
 import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserAlreadyExistsException
 import de.riednic.taskflow.user.domain.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
