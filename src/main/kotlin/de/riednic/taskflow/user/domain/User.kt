@@ -1,9 +1,10 @@
 package de.riednic.taskflow.user.domain
 
+import java.util.UUID
 import kotlin.time.Instant
 
-data class User(
-    val id: Long,
+class User(
+    val id: UUID = UUID.randomUUID(),
     val name: String,
     val email: String,
     val passwordHash: String,
