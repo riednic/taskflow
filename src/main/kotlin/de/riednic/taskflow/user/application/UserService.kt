@@ -1,16 +1,15 @@
 package de.riednic.taskflow.user.application
 
 import de.riednic.taskflow.user.controller.CreateUserRequest
-import de.riednic.taskflow.user.domain.EmailAlreadyExistsException
+import de.riednic.taskflow.user.domain.UserAlreadyExistsException
+import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
 import de.riednic.taskflow.user.domain.UserNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.time.Instant
 import java.util.UUID
-import kotlin.time.toKotlinInstant
 
 @Service
 class UserService(
@@ -20,15 +19,14 @@ class UserService(
 
     fun createUser(request: CreateUserRequest): User {
         if (userRepository.findByEmail(request.email) != null) {
-            throw EmailAlreadyExistsException(request.email)
+            throw UserAlreadyExistsException(request.email)
         }
 
-        val newUser = User(
+        val newUser = NewUser(
             name = request.name,
             email = request.email,
             passwordHash = requireNotNull(passwordEncoder.encode(request.rawPassword)),
             role = request.role,
-            createdAt = Instant.now().toKotlinInstant(),
         )
 
         return userRepository.save(newUser)
