@@ -20,9 +20,9 @@ data class CreateUserRequest(
     val email: String,
 
     @NotBlank
-    @Size(min = 8, max = 72)
+    @Size(min = 8, max = 256)
     @JsonProperty("password")
-    val password: String,
+    val rawPassword: String,
 
     @NotNull
     @JsonProperty("role")
