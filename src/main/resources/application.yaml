@@ -15,5 +15,10 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+  data:
+    web:
+      pageable:
+        serialization-mode: via-dto
+
   flyway:
     enabled: true

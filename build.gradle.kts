@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "4.1.0"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.3.21"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "de.riednic"
@@ -42,12 +43,51 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.8")
 }
 
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
     }
+}
+
+detekt {
+    toolVersion = "1.23.8"
+    config.setFrom(files("$rootDir/config/detekt/default-detekt-config.yml"))
+    buildUponDefaultConfig = true
+    autoCorrect = true
+    parallel = true
+    source.setFrom("src/main/kotlin")
+}
+
+// According to https://detekt.dev/docs/gettingstarted/gradle/#dependencies
+// Spring's dependency-management plugin aligns Kotlin versions across all
+// configurations, including detekt's own runtime classpath, which breaks
+// detekt (it embeds a specific Kotlin compiler version). Pin the "detekt"
+// configuration back to the version detekt was actually built against.
+configurations.matching { it.name == "detekt" }.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") {
+            useVersion(io.gitlab.arturbosch.detekt.getSupportedKotlinVersion())
+        }
+    }
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    jvmTarget = "21"
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+        sarif.required.set(true)
+        txt.required.set(false)
+        md.required.set(false)
+    }
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "21"
 }
 
 allOpen {
