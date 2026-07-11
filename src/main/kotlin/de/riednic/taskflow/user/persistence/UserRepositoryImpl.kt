@@ -6,7 +6,6 @@ import de.riednic.taskflow.user.domain.User
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
-import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.toKotlinInstant
 
@@ -15,7 +14,7 @@ class UserRepositoryImpl(
     private val springDataUserRepository: SpringDataUserRepository,
 ) : UserRepository {
 
-    override fun findById(id: UUID): User? =
+    override fun findById(id: Long): User? =
         springDataUserRepository.findById(id).getOrNull()?.toDomain()
 
     override fun findByEmail(email: String): User? =

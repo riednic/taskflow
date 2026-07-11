@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
 @Validated
 @RestController
@@ -33,7 +32,7 @@ class UserController(
     }
 
     @GetMapping("/{id}")
-    fun getUserById(@PathVariable id: UUID): UserResponse {
+    fun getUserById(@PathVariable id: Long): UserResponse {
         return userService.getUserById(id).toResponse()
     }
 

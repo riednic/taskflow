@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class UserService(
@@ -32,7 +31,7 @@ class UserService(
         return userRepository.save(newUser)
     }
 
-    fun getUserById(id: UUID): User {
+    fun getUserById(id: Long): User {
         return userRepository.findById(id) ?: throw UserNotFoundException(id)
     }
 

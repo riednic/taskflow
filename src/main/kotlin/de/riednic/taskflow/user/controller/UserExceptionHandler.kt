@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
-// TODO: Overthink exception handling
+// Overthink exception handling
 @RestControllerAdvice(assignableTypes = [UserController::class])
 class UserExceptionHandler {
 

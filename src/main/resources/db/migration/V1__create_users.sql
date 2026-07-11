@@ -8,7 +8,7 @@ CREATE TYPE user_role AS ENUM (
 
 CREATE TABLE users
 (
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id            BIGSERIAL PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
     email         CITEXT NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
