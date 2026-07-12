@@ -46,7 +46,6 @@ class TaskRepositoryImpl(
 
         savedTaskEntity.title = replacementTask.title
         savedTaskEntity.description = replacementTask.description
-        savedTaskEntity.status = replacementTask.status
         savedTaskEntity.priority = replacementTask.priority
         savedTaskEntity.assignedTo = replacementTask.assignedTo
 
@@ -67,7 +66,6 @@ class TaskRepositoryImpl(
 
         savedTaskEntity.title = updatedTask.title ?: savedTaskEntity.title
         savedTaskEntity.description = updatedTask.description ?: savedTaskEntity.description
-        savedTaskEntity.status = updatedTask.status ?: savedTaskEntity.status
         savedTaskEntity.priority = updatedTask.priority ?: savedTaskEntity.priority
         savedTaskEntity.assignedTo = updatedTask.assignedTo ?: savedTaskEntity.assignedTo
 

@@ -1,5 +1,6 @@
 package de.riednic.taskflow.task.controller
 
+import de.riednic.taskflow.auth.application.AuthUser
 import de.riednic.taskflow.common.ServiceResult
 import de.riednic.taskflow.task.application.TaskService
 import de.riednic.taskflow.task.domain.TaskFilter
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -90,6 +92,18 @@ class TaskController(
         @Valid @RequestBody request: UpdateTaskRequest,
     ): ResponseEntity<Any> {
         return when (val result = taskService.updateTask(id, request)) {
+            is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
+            else -> result.toErrorResponse()
+        }
+    }
+
+    @PostMapping("/{id}/status")
+    fun transitionTaskStatus(
+        @PathVariable id: Long,
+        @Valid @RequestBody request: TransitionTaskStatusRequest,
+        @AuthenticationPrincipal authUser: AuthUser,
+    ): ResponseEntity<Any> {
+        return when (val result = taskService.transitionTaskStatus(id, request, authUser.id, authUser.role)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             else -> result.toErrorResponse()
         }

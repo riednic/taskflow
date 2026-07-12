@@ -4,7 +4,6 @@ data class UpdatedTask(
     val id: Long,
     val title: String? = null,
     val description: String? = null,
-    val status: TaskStatus? = null,
     val priority: TaskPriority? = null,
     val assignedTo: Long? = null,
     val version: Long,

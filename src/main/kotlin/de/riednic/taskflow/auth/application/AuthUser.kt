@@ -8,5 +8,5 @@ class AuthUser(
     val id: Long,
     email: String,
     passwordHash: String,
-    role: UserRole,
+    val role: UserRole,
 ) : User(email, passwordHash, listOf(SimpleGrantedAuthority(role.name)))

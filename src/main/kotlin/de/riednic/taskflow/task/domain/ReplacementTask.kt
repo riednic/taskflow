@@ -4,7 +4,6 @@ data class ReplacementTask(
     val id: Long,
     val title: String,
     val description: String?,
-    val status: TaskStatus,
     val priority: TaskPriority,
     val assignedTo: Long? = null,
     val version: Long,
