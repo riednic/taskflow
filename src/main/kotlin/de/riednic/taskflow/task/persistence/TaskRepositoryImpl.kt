@@ -1,6 +1,7 @@
 package de.riednic.taskflow.task.persistence
 
 import de.riednic.taskflow.common.RepositoryResult
+import de.riednic.taskflow.common.markRollbackOnly
 import de.riednic.taskflow.task.application.TaskRepository
 import de.riednic.taskflow.task.domain.NewTask
 import de.riednic.taskflow.task.domain.ReplacementTask
@@ -34,7 +35,7 @@ class TaskRepositoryImpl(
         conflictMessage = "Task could not be saved due to a data conflict.",
         unexpectedErrorMessage = "Unexpected error while saving task.",
     ) {
-        springDataTaskRepository.save(newTask.toEntity())
+        springDataTaskRepository.saveAndFlush(newTask.toEntity())
             .toDomainResult("Could not map saved task to domain model.")
     }
 
@@ -102,22 +103,27 @@ private inline fun <T> catchingPersistenceErrors(
 } catch (_: EmptyResultDataAccessException) {
     RepositoryResult.NotFound
 } catch (e: ObjectOptimisticLockingFailureException) {
+    markRollbackOnly()
     RepositoryResult.VersionConflict("Task was modified concurrently.", e)
 } catch (e: DataIntegrityViolationException) {
+    markRollbackOnly()
     RepositoryResult.Conflict(conflictMessage, e)
 } catch (e: Exception) {
+    markRollbackOnly()
     RepositoryResult.UnexpectedError(unexpectedErrorMessage, e)
 }
 
 private fun TaskEntity.toDomainResult(errorMessage: String): RepositoryResult<Task> = try {
     RepositoryResult.Success(toDomain())
 } catch (e: IllegalArgumentException) {
+    markRollbackOnly()
     RepositoryResult.UnexpectedError(errorMessage, e)
 }
 
 private fun Page<TaskEntity>.toDomainResult(errorMessage: String): RepositoryResult<Page<Task>> = try {
     RepositoryResult.Success(map { it.toDomain() })
 } catch (e: IllegalArgumentException) {
+    markRollbackOnly()
     RepositoryResult.UnexpectedError(errorMessage, e)
 }
 

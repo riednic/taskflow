@@ -23,10 +23,12 @@ class TaskService(
     private val taskRepository: TaskRepository
 ) {
 
+    @Transactional(readOnly = true)
     fun getTasks(filter: TaskFilter, pageable: Pageable): ServiceResult<Page<Task>> {
         return taskRepository.findAll(filter, pageable).toServiceResult()
     }
 
+    @Transactional(readOnly = true)
     fun getTaskById(taskId: Long): ServiceResult<Task> {
         return taskRepository.findById(taskId).toServiceResult()
     }
