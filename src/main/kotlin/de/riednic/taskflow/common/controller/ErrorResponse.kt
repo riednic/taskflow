@@ -21,6 +21,7 @@ fun errorEntity(status: HttpStatus, error: String, message: String): ResponseEnt
 private fun ErrorCategory.toHttpStatus(): HttpStatus = when (this) {
     ErrorCategory.NOT_FOUND -> HttpStatus.NOT_FOUND
     ErrorCategory.BAD_REQUEST -> HttpStatus.BAD_REQUEST
+    ErrorCategory.UNAUTHORIZED -> HttpStatus.UNAUTHORIZED
     ErrorCategory.FORBIDDEN -> HttpStatus.FORBIDDEN
     ErrorCategory.CONFLICT -> HttpStatus.CONFLICT
     ErrorCategory.INTERNAL -> HttpStatus.INTERNAL_SERVER_ERROR

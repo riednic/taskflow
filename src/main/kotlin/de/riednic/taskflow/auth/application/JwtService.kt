@@ -1,6 +1,5 @@
-package de.riednic.taskflow.security
+package de.riednic.taskflow.auth.application
 
-import de.riednic.taskflow.auth.application.AuthUser
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys

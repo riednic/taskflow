@@ -51,6 +51,7 @@ sealed interface ServiceResult<out T> {
 enum class ErrorCategory {
     NOT_FOUND,
     BAD_REQUEST,
+    UNAUTHORIZED,
     FORBIDDEN,
     CONFLICT,
     INTERNAL,

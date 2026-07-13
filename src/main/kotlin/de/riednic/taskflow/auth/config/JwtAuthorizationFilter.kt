@@ -1,6 +1,7 @@
-package de.riednic.taskflow.security
+package de.riednic.taskflow.auth.config
 
 import de.riednic.taskflow.auth.application.AuthUserDetailsService
+import de.riednic.taskflow.auth.application.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

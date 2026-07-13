@@ -1,4 +1,4 @@
-package de.riednic.taskflow.security
+package de.riednic.taskflow.auth.config
 
 import de.riednic.taskflow.auth.application.AuthUserDetailsService
 import org.springframework.context.annotation.Bean

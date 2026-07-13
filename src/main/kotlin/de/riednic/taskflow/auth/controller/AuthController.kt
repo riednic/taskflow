@@ -1,7 +1,10 @@
 package de.riednic.taskflow.auth.controller
 
 import de.riednic.taskflow.auth.application.AuthService
+import de.riednic.taskflow.common.application.ServiceResult
+import de.riednic.taskflow.common.controller.toResponseEntity
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -16,6 +19,10 @@ class AuthController(
 ) {
 
     @PostMapping("/login")
-    fun login(@Valid @RequestBody request: LoginRequest): LoginResponse =
-        authService.login(request.email, request.password)
+    fun login(@Valid @RequestBody request: LoginRequest): ResponseEntity<Any> {
+        return when (val result = authService.login(request.email, request.password)) {
+            is ServiceResult.Success -> ResponseEntity.ok(result.value)
+            is ServiceResult.Error -> result.toResponseEntity()
+        }
+    }
 }
