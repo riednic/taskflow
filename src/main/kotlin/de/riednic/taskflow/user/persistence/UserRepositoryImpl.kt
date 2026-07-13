@@ -3,6 +3,7 @@ package de.riednic.taskflow.user.persistence
 import de.riednic.taskflow.user.application.UserRepository
 import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserRole
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
@@ -22,6 +23,9 @@ class UserRepositoryImpl(
 
     override fun findAll(pageable: Pageable): Page<User> =
         springDataUserRepository.findAll(pageable).map { it.toDomain() }
+
+    override fun findAllByRole(role: UserRole): List<User> =
+        springDataUserRepository.findAllByRole(role).map { it.toDomain() }
 
     override fun save(user: NewUser): User =
         springDataUserRepository.save(user.toEntity()).toDomain()
