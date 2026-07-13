@@ -105,7 +105,7 @@ class TaskRepositoryImpl(
             unexpectedErrorMessage = "Unexpected error while deleting task.",
         ) {
             springDataTaskRepository.deleteById(id)
-            RepositoryResult.Deleted
+            RepositoryResult.Ok(Unit)
         }
     }
 }
