@@ -1,18 +1,17 @@
 package de.riednic.taskflow.task.persistence
 
-import de.riednic.taskflow.common.RepositoryResult
-import de.riednic.taskflow.common.markRollbackOnly
+import de.riednic.taskflow.common.persistence.RepositoryResult
+import de.riednic.taskflow.common.persistence.catchingPersistenceErrors
+import de.riednic.taskflow.common.persistence.markRollbackOnly
 import de.riednic.taskflow.task.application.TaskRepository
 import de.riednic.taskflow.task.domain.NewTask
 import de.riednic.taskflow.task.domain.ReplacementTask
 import de.riednic.taskflow.task.domain.Task
 import de.riednic.taskflow.task.domain.TaskFilter
+import de.riednic.taskflow.task.domain.TaskStatus
 import de.riednic.taskflow.task.domain.UpdatedTask
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.stereotype.Repository
 import kotlin.jvm.optionals.getOrNull
 
@@ -79,7 +78,24 @@ class TaskRepositoryImpl(
         }
     }
 
-    override fun delete(id: Long): RepositoryResult<Nothing> {
+    override fun transition(taskId: Long, targetStatus: TaskStatus, expectedVersion: Long): RepositoryResult<Task> {
+        val savedTaskEntity = springDataTaskRepository.findById(taskId).getOrNull()
+            ?: return RepositoryResult.NotFound
+
+        savedTaskEntity.checkVersion(expectedVersion)?.let { return it }
+
+        savedTaskEntity.status = targetStatus
+
+        return catchingPersistenceErrors(
+            conflictMessage = "Task could not be transitioned due to a data conflict.",
+            unexpectedErrorMessage = "Unexpected error while transitioning task.",
+        ) {
+            springDataTaskRepository.saveAndFlush(savedTaskEntity)
+                .toDomainResult("Could not map transitioned task to domain model.")
+        }
+    }
+
+    override fun delete(id: Long): RepositoryResult<Unit> {
         if (!springDataTaskRepository.existsById(id)) {
             return RepositoryResult.NotFound
         }
@@ -94,34 +110,15 @@ class TaskRepositoryImpl(
     }
 }
 
-private inline fun <T> catchingPersistenceErrors(
-    conflictMessage: String,
-    unexpectedErrorMessage: String,
-    block: () -> RepositoryResult<T>,
-): RepositoryResult<T> = try {
-    block()
-} catch (_: EmptyResultDataAccessException) {
-    RepositoryResult.NotFound
-} catch (e: ObjectOptimisticLockingFailureException) {
-    markRollbackOnly()
-    RepositoryResult.VersionConflict("Task was modified concurrently.", e)
-} catch (e: DataIntegrityViolationException) {
-    markRollbackOnly()
-    RepositoryResult.Conflict(conflictMessage, e)
-} catch (e: Exception) {
-    markRollbackOnly()
-    RepositoryResult.UnexpectedError(unexpectedErrorMessage, e)
-}
-
 private fun TaskEntity.toDomainResult(errorMessage: String): RepositoryResult<Task> = try {
-    RepositoryResult.Success(toDomain())
+    RepositoryResult.Ok(toDomain())
 } catch (e: IllegalArgumentException) {
     markRollbackOnly()
     RepositoryResult.UnexpectedError(errorMessage, e)
 }
 
 private fun Page<TaskEntity>.toDomainResult(errorMessage: String): RepositoryResult<Page<Task>> = try {
-    RepositoryResult.Success(map { it.toDomain() })
+    RepositoryResult.Ok(map { it.toDomain() })
 } catch (e: IllegalArgumentException) {
     markRollbackOnly()
     RepositoryResult.UnexpectedError(errorMessage, e)
