@@ -8,5 +8,5 @@ data class LoginResponse(
     val token: String,
 
     @JsonProperty("expiresIn")
-    val expiresIn: Int
+    val expiresIn: Int,
 )

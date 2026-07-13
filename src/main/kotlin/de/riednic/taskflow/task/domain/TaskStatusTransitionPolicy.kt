@@ -1,5 +1,6 @@
 package de.riednic.taskflow.task.domain
 
+import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
 
 private val possibleTransitions = mapOf(
@@ -16,7 +17,7 @@ fun TaskStatus.isValidTransitionTo(target: TaskStatus): Boolean =
 
 object TaskStatusTransitionPolicy {
 
-    fun isAllowed(role: UserRole, requestingUserId: Long, task: Task, target: TaskStatus): Boolean {
+    fun isAllowed(role: UserRole, requestingUserId: UserId, task: Task, target: TaskStatus): Boolean {
         val isAssignedOrAdmin = role == UserRole.ADMIN || task.assignedTo == requestingUserId
         return when (target) {
             TaskStatus.IN_PROGRESS, TaskStatus.IN_REVIEW, TaskStatus.CANCELLED -> isAssignedOrAdmin

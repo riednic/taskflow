@@ -1,3 +1,3 @@
 package de.riednic.taskflow.task.domain
 
-data class TaskEnteredReviewEvent(val taskId: Long)
+data class TaskEnteredReviewEvent(val taskId: TaskId)

@@ -1,5 +1,6 @@
 package de.riednic.taskflow.task.domain
 
+import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
@@ -8,12 +9,12 @@ import kotlin.time.toKotlinInstant
 
 class TaskTransitionPolicyTest {
 
-    private val assignedUserId = 1L
-    private val otherUserId = 2L
+    private val assignedUserId = UserId(1L)
+    private val otherUserId = UserId(2L)
     private val now = java.time.Instant.now().toKotlinInstant()
 
-    private fun task(assignedTo: Long?) = Task(
-        id = 1,
+    private fun task(assignedTo: UserId?) = Task(
+        id = TaskId(1),
         title = "Task",
         description = null,
         status = TaskStatus.TODO,
