@@ -1,9 +1,9 @@
 package de.riednic.taskflow.task.application
 
-import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.common.application.ServiceResult
 import de.riednic.taskflow.common.application.toServiceError
 import de.riednic.taskflow.common.application.toServiceResult
+import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.task.controller.CreateTaskRequest
 import de.riednic.taskflow.task.controller.ReplaceTaskRequest
 import de.riednic.taskflow.task.controller.TransitionTaskStatusRequest
