@@ -1,5 +1,6 @@
 package de.riednic.taskflow.auth.application
 
+import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.user.application.UserRepository
 import de.riednic.taskflow.user.domain.User
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -12,17 +13,21 @@ class AuthUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): AuthUser {
-        val user = userRepository.findByEmail(email)
-            ?: throw UsernameNotFoundException("User with email '$email' not found")
+        val result = userRepository.findByEmail(email)
+        if (result !is RepositoryResult.Success) {
+            throw UsernameNotFoundException("User with email '$email' not found")
+        }
 
-        return user.toAuthUser()
+        return result.value.toAuthUser()
     }
 
     fun loadUserById(id: Long): AuthUser {
-        val user = userRepository.findById(id)
-            ?: throw UsernameNotFoundException("User with id '$id' not found")
+        val result = userRepository.findById(id)
+        if (result !is RepositoryResult.Success) {
+            throw UsernameNotFoundException("User with id '$id' not found")
+        }
 
-        return user.toAuthUser()
+        return result.value.toAuthUser()
     }
 
     private fun User.toAuthUser(): AuthUser = AuthUser(

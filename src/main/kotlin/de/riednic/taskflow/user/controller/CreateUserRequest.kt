@@ -26,5 +26,5 @@ data class CreateUserRequest(
 
     @NotNull
     @JsonProperty("role")
-    val role: UserRole
+    val role: UserRole,
 )

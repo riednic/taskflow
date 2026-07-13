@@ -1,5 +1,6 @@
 package de.riednic.taskflow.task.application
 
+import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.task.domain.TaskEnteredReviewEvent
 import de.riednic.taskflow.user.application.UserRepository
 import de.riednic.taskflow.user.domain.UserRole
@@ -20,7 +21,12 @@ class TaskReviewNotificationListener(
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun onTaskEnteredReview(event: TaskEnteredReviewEvent) {
         val reviewers = userRepository.findAllByRole(UserRole.REVIEWER)
-        reviewers.forEach { reviewer ->
+        if (reviewers !is RepositoryResult.Success) {
+            log.warn("Could not load reviewers to notify about task {} entering review.", event.taskId)
+            return
+        }
+
+        reviewers.value.forEach { reviewer ->
             log.info("Notifying reviewer {} that task {} is ready for review.", reviewer.id, event.taskId)
         }
     }

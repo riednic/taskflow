@@ -36,16 +36,14 @@ data class TaskResponse(
     val updatedAt: Instant
 )
 
-fun Task.toResponse(): TaskResponse {
-    return TaskResponse(
-        id = id,
-        title = title,
-        description = description,
-        status = status,
-        priority = priority,
-        assignedTo = assignedTo,
-        version = version,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
-}
+fun Task.toResponse() = TaskResponse(
+    id = id,
+    title = title,
+    description = description,
+    status = status,
+    priority = priority,
+    assignedTo = assignedTo,
+    version = version,
+    createdAt = createdAt,
+    updatedAt = updatedAt
+)

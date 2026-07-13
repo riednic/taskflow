@@ -1,7 +1,5 @@
 package de.riednic.taskflow.common.controller
 
-import de.riednic.taskflow.user.domain.UserAlreadyExistsException
-import de.riednic.taskflow.user.domain.UserNotFoundException
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -29,14 +27,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException::class)
     fun handleAccessDenied(ex: AccessDeniedException): ResponseEntity<Any> =
         errorEntity(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.message ?: "Access is denied.")
-
-    @ExceptionHandler(UserAlreadyExistsException::class)
-    fun handleUserAlreadyExists(ex: UserAlreadyExistsException): ResponseEntity<Any> =
-        errorEntity(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", ex.message ?: "User already exists.")
-
-    @ExceptionHandler(UserNotFoundException::class)
-    fun handleUserNotFound(ex: UserNotFoundException): ResponseEntity<Any> =
-        errorEntity(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", ex.message ?: "User not found.")
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolation(ex: ConstraintViolationException): ResponseEntity<Any> =
