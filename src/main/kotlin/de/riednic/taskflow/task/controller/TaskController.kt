@@ -1,7 +1,8 @@
 package de.riednic.taskflow.task.controller
 
 import de.riednic.taskflow.auth.application.AuthUser
-import de.riednic.taskflow.common.ServiceResult
+import de.riednic.taskflow.common.application.ServiceResult
+import de.riednic.taskflow.common.controller.toResponseEntity
 import de.riednic.taskflow.task.application.TaskService
 import de.riednic.taskflow.task.domain.TaskFilter
 import de.riednic.taskflow.task.domain.TaskPriority
@@ -9,9 +10,6 @@ import de.riednic.taskflow.task.domain.TaskStatus
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
-import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -45,7 +43,7 @@ class TaskController(
         val filter = TaskFilter(status = status, priority = priority, assignedTo = assignedTo)
         return when (val result = taskService.getTasks(filter, pageable)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.map { it.toResponse() })
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -53,7 +51,7 @@ class TaskController(
     fun getTaskById(@PathVariable id: Long): ResponseEntity<Any> {
         return when (val result = taskService.getTaskById(id)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -69,7 +67,7 @@ class TaskController(
                 ResponseEntity.created(location).body(task)
             }
 
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -80,7 +78,7 @@ class TaskController(
     ): ResponseEntity<Any> {
         return when (val result = taskService.replaceTask(id, request)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -93,7 +91,7 @@ class TaskController(
     ): ResponseEntity<Any> {
         return when (val result = taskService.updateTask(id, request)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -105,7 +103,7 @@ class TaskController(
     ): ResponseEntity<Any> {
         return when (val result = taskService.transitionTaskStatus(id, request, authUser.id, authUser.role)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
-            else -> result.toErrorResponse()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 
@@ -115,23 +113,8 @@ class TaskController(
         @PathVariable id: Long,
     ): ResponseEntity<Any> {
         return when (val result = taskService.deleteTask(id)) {
-            is ServiceResult.Deleted -> ResponseEntity.noContent().build()
-            else -> result.toErrorResponse()
+            is ServiceResult.Success -> ResponseEntity.noContent().build()
+            is ServiceResult.Error -> result.toResponseEntity()
         }
     }
 }
-
-private fun ServiceResult<*>.toErrorResponse(): ResponseEntity<Any> = when (this) {
-    is ServiceResult.Success -> error("Success is not an error state")
-    is ServiceResult.Deleted -> error("Deleted is not an error state")
-    is ServiceResult.NotFound -> problemDetailResponse(HttpStatus.NOT_FOUND, "Task not found.")
-    is ServiceResult.ValidationError -> problemDetailResponse(HttpStatus.BAD_REQUEST, message)
-    is ServiceResult.Conflict -> problemDetailResponse(HttpStatus.CONFLICT, message)
-    is ServiceResult.VersionConflict -> problemDetailResponse(HttpStatus.CONFLICT, message)
-    is ServiceResult.UnexpectedError -> problemDetailResponse(HttpStatus.INTERNAL_SERVER_ERROR, message)
-}
-
-private fun problemDetailResponse(status: HttpStatus, detail: String): ResponseEntity<Any> =
-    ResponseEntity.status(status)
-        .contentType(MediaType.APPLICATION_PROBLEM_JSON)
-        .body(ProblemDetail.forStatusAndDetail(status, detail))
