@@ -7,12 +7,17 @@ sealed interface RepositoryResult<out T> {
     }
 
     data class Ok<out T>(override val value: T) : Success<T>
-    data object Deleted : Success<Unit> {
-        override val value = Unit
+
+    sealed interface Error : RepositoryResult<Nothing> {
+        val message: String
+        val throwable: Throwable? get() = null
     }
 
-    data object NotFound : RepositoryResult<Nothing>
-    data class Conflict(val message: String, val throwable: Throwable?) : RepositoryResult<Nothing>
-    data class VersionConflict(val message: String, val throwable: Throwable?) : RepositoryResult<Nothing>
-    data class UnexpectedError(val message: String, val throwable: Throwable?) : RepositoryResult<Nothing>
+    data object NotFound : Error {
+        override val message = "Resource not found."
+    }
+
+    data class Conflict(override val message: String, override val throwable: Throwable? = null) : Error
+    data class VersionConflict(override val message: String, override val throwable: Throwable? = null) : Error
+    data class UnexpectedError(override val message: String, override val throwable: Throwable? = null) : Error
 }

@@ -9,9 +9,6 @@ sealed interface ServiceResult<out T> {
     }
 
     data class Ok<out T>(override val value: T) : Success<T>
-    data object Deleted : Success<Unit> {
-        override val value = Unit
-    }
 
     interface Error : ServiceResult<Nothing> {
         val code: String
@@ -59,10 +56,14 @@ enum class ErrorCategory {
     INTERNAL,
 }
 
-fun <T> RepositoryResult<T>.toServiceResult(): ServiceResult<T> = when (this) {
-    is RepositoryResult.Success -> ServiceResult.Ok(value)
-    is RepositoryResult.NotFound -> ServiceResult.NotFound()
+fun RepositoryResult.Error.toServiceError(): ServiceResult.Error = when (this) {
+    is RepositoryResult.NotFound -> ServiceResult.NotFound(message)
     is RepositoryResult.Conflict -> ServiceResult.Conflict(message, throwable)
     is RepositoryResult.VersionConflict -> ServiceResult.VersionConflict(message, throwable)
     is RepositoryResult.UnexpectedError -> ServiceResult.UnexpectedError(message, throwable)
+}
+
+fun <T> RepositoryResult<T>.toServiceResult(): ServiceResult<T> = when (this) {
+    is RepositoryResult.Success -> ServiceResult.Ok(value)
+    is RepositoryResult.Error -> toServiceError()
 }
