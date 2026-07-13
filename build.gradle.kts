@@ -78,7 +78,7 @@ configurations.matching { it.name == "detekt" }.configureEach {
     }
 }
 
-// TODO: re-enable once the outstanding findings from the task-transition refactor are cleaned up.
+// TODO: re-enable once the outstanding findings are fixed or the config is adjusted.
 tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     jvmTarget = "21"
     enabled = false

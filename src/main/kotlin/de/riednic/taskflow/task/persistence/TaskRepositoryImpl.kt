@@ -8,6 +8,7 @@ import de.riednic.taskflow.task.domain.NewTask
 import de.riednic.taskflow.task.domain.ReplacementTask
 import de.riednic.taskflow.task.domain.Task
 import de.riednic.taskflow.task.domain.TaskFilter
+import de.riednic.taskflow.task.domain.TaskId
 import de.riednic.taskflow.task.domain.TaskStatus
 import de.riednic.taskflow.task.domain.UpdatedTask
 import org.springframework.data.domain.Page
@@ -20,8 +21,8 @@ class TaskRepositoryImpl(
     private val springDataTaskRepository: SpringDataTaskRepository,
 ) : TaskRepository {
 
-    override fun findById(id: Long): RepositoryResult<Task> {
-        val taskEntity = springDataTaskRepository.findById(id).getOrNull() ?: return RepositoryResult.NotFound
+    override fun findById(id: TaskId): RepositoryResult<Task> {
+        val taskEntity = springDataTaskRepository.findById(id.value).getOrNull() ?: return RepositoryResult.NotFound
         return taskEntity.toDomainResult("Could not map saved task to domain model.")
     }
 
@@ -39,7 +40,7 @@ class TaskRepositoryImpl(
     }
 
     override fun replace(replacementTask: ReplacementTask): RepositoryResult<Task> {
-        val savedTaskEntity = springDataTaskRepository.findById(replacementTask.id).getOrNull()
+        val savedTaskEntity = springDataTaskRepository.findById(replacementTask.id.value).getOrNull()
             ?: return RepositoryResult.NotFound
 
         savedTaskEntity.checkVersion(replacementTask.version)?.let { return it }
@@ -47,7 +48,7 @@ class TaskRepositoryImpl(
         savedTaskEntity.title = replacementTask.title
         savedTaskEntity.description = replacementTask.description
         savedTaskEntity.priority = replacementTask.priority
-        savedTaskEntity.assignedTo = replacementTask.assignedTo
+        savedTaskEntity.assignedTo = replacementTask.assignedTo?.value
 
         return catchingPersistenceErrors(
             conflictMessage = "Task could not be updated due to a data conflict.",
@@ -59,7 +60,7 @@ class TaskRepositoryImpl(
     }
 
     override fun update(updatedTask: UpdatedTask): RepositoryResult<Task> {
-        val savedTaskEntity = springDataTaskRepository.findById(updatedTask.id).getOrNull()
+        val savedTaskEntity = springDataTaskRepository.findById(updatedTask.id.value).getOrNull()
             ?: return RepositoryResult.NotFound
 
         savedTaskEntity.checkVersion(updatedTask.version)?.let { return it }
@@ -67,7 +68,7 @@ class TaskRepositoryImpl(
         savedTaskEntity.title = updatedTask.title ?: savedTaskEntity.title
         savedTaskEntity.description = updatedTask.description ?: savedTaskEntity.description
         savedTaskEntity.priority = updatedTask.priority ?: savedTaskEntity.priority
-        savedTaskEntity.assignedTo = updatedTask.assignedTo ?: savedTaskEntity.assignedTo
+        savedTaskEntity.assignedTo = updatedTask.assignedTo?.value ?: savedTaskEntity.assignedTo
 
         return catchingPersistenceErrors(
             conflictMessage = "Task could not be updated due to a data conflict.",
@@ -78,8 +79,8 @@ class TaskRepositoryImpl(
         }
     }
 
-    override fun transition(taskId: Long, targetStatus: TaskStatus, expectedVersion: Long): RepositoryResult<Task> {
-        val savedTaskEntity = springDataTaskRepository.findById(taskId).getOrNull()
+    override fun transition(taskId: TaskId, targetStatus: TaskStatus, expectedVersion: Long): RepositoryResult<Task> {
+        val savedTaskEntity = springDataTaskRepository.findById(taskId.value).getOrNull()
             ?: return RepositoryResult.NotFound
 
         savedTaskEntity.checkVersion(expectedVersion)?.let { return it }
@@ -95,8 +96,8 @@ class TaskRepositoryImpl(
         }
     }
 
-    override fun delete(id: Long): RepositoryResult<Unit> {
-        if (!springDataTaskRepository.existsById(id)) {
+    override fun delete(id: TaskId): RepositoryResult<Unit> {
+        if (!springDataTaskRepository.existsById(id.value)) {
             return RepositoryResult.NotFound
         }
 
@@ -104,7 +105,7 @@ class TaskRepositoryImpl(
             conflictMessage = "Task could not be deleted due to a data conflict.",
             unexpectedErrorMessage = "Unexpected error while deleting task.",
         ) {
-            springDataTaskRepository.deleteById(id)
+            springDataTaskRepository.deleteById(id.value)
             RepositoryResult.Ok(Unit)
         }
     }

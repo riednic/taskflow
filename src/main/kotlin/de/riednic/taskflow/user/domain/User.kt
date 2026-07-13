@@ -3,7 +3,7 @@ package de.riednic.taskflow.user.domain
 import kotlin.time.Instant
 
 data class User(
-    val id: Long,
+    val id: UserId,
     val name: String,
     val email: String,
     val passwordHash: String,
@@ -11,7 +11,7 @@ data class User(
     val createdAt: Instant,
 ) {
     init {
-        require(id > 0) { "id must be positive, was $id" }
+        require(id.value > 0) { "id must be positive, was $id" }
         require(name.isNotBlank()) { "name must not be blank" }
         require(name.length <= MAX_NAME_LENGTH) { "name must not exceed $MAX_NAME_LENGTH characters" }
         require(email.isNotBlank()) { "email must not be blank" }

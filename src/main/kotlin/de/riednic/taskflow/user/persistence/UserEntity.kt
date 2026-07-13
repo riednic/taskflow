@@ -2,6 +2,7 @@ package de.riednic.taskflow.user.persistence
 
 import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -56,7 +57,7 @@ fun NewUser.toEntity(): UserEntity = UserEntity(
 
 @Throws(IllegalArgumentException::class)
 fun UserEntity.toDomain(): User = User(
-    id = id,
+    id = UserId(id),
     name = name,
     email = email,
     passwordHash = passwordHash,

@@ -6,6 +6,7 @@ import de.riednic.taskflow.common.persistence.markRollbackOnly
 import de.riednic.taskflow.user.application.UserRepository
 import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -17,8 +18,8 @@ class UserRepositoryImpl(
     private val springDataUserRepository: SpringDataUserRepository,
 ) : UserRepository {
 
-    override fun findById(id: Long): RepositoryResult<User> {
-        val userEntity = springDataUserRepository.findById(id).getOrNull() ?: return RepositoryResult.NotFound
+    override fun findById(id: UserId): RepositoryResult<User> {
+        val userEntity = springDataUserRepository.findById(id.value).getOrNull() ?: return RepositoryResult.NotFound
         return userEntity.toDomainResult("Could not map saved user to domain model.")
     }
 

@@ -24,7 +24,7 @@ data class UserResponse(
 )
 
 fun User.toResponse() = UserResponse(
-    id = id,
+    id = id.value,
     name = name,
     email = email,
     role = role,

@@ -2,8 +2,10 @@ package de.riednic.taskflow.task.persistence
 
 import de.riednic.taskflow.task.domain.NewTask
 import de.riednic.taskflow.task.domain.Task
+import de.riednic.taskflow.task.domain.TaskId
 import de.riednic.taskflow.task.domain.TaskPriority
 import de.riednic.taskflow.task.domain.TaskStatus
+import de.riednic.taskflow.user.domain.UserId
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -70,19 +72,19 @@ fun NewTask.toEntity(): TaskEntity {
         description = description,
         status = status,
         priority = priority,
-        assignedTo = assignedTo,
+        assignedTo = assignedTo?.value,
     )
 }
 
 @Throws(IllegalArgumentException::class)
 fun TaskEntity.toDomain(): Task {
     return Task(
-        id = id,
+        id = TaskId(id),
         title = title,
         description = description,
         status = status,
         priority = priority,
-        assignedTo = assignedTo,
+        assignedTo = assignedTo?.let { UserId(it) },
         version = version,
         createdAt = requireNotNull(createdAt) {
             "createdAt was not populated by JPA auditing for TaskEntity id=$id"

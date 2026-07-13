@@ -3,6 +3,7 @@ package de.riednic.taskflow.user.controller
 import de.riednic.taskflow.common.application.ServiceResult
 import de.riednic.taskflow.common.controller.toResponseEntity
 import de.riednic.taskflow.user.application.UserService
+import de.riednic.taskflow.user.domain.UserId
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -53,7 +54,7 @@ class UserController(
     @PreAuthorize("hasAnyAuthority('ADMIN', 'REVIEWER')")
     @GetMapping("/{id}")
     fun getUserById(@PathVariable id: Long): ResponseEntity<Any> {
-        return when (val result = userService.getUserById(id)) {
+        return when (val result = userService.getUserById(UserId(id))) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             is ServiceResult.Error -> result.toResponseEntity()
         }

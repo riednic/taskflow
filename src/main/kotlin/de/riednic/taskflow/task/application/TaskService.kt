@@ -13,10 +13,12 @@ import de.riednic.taskflow.task.domain.ReplacementTask
 import de.riednic.taskflow.task.domain.Task
 import de.riednic.taskflow.task.domain.TaskEnteredReviewEvent
 import de.riednic.taskflow.task.domain.TaskFilter
+import de.riednic.taskflow.task.domain.TaskId
 import de.riednic.taskflow.task.domain.TaskStatus
 import de.riednic.taskflow.task.domain.TaskStatusTransitionPolicy
 import de.riednic.taskflow.task.domain.UpdatedTask
 import de.riednic.taskflow.task.domain.isValidTransitionTo
+import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
@@ -38,7 +40,7 @@ class TaskService(
     }
 
     @Transactional(readOnly = true)
-    fun getTaskById(taskId: Long): ServiceResult<Task> {
+    fun getTaskById(taskId: TaskId): ServiceResult<Task> {
         return taskRepository.findById(taskId).toServiceResult()
     }
 
@@ -49,7 +51,7 @@ class TaskService(
                 description = request.description,
                 status = request.status,
                 priority = request.priority,
-                assignedTo = request.assignedTo,
+                assignedTo = request.assignedTo?.let { UserId(it) },
             )
         } catch (e: IllegalArgumentException) {
             return ServiceResult.ValidationError(e.message ?: "Invalid task data.")
@@ -58,14 +60,14 @@ class TaskService(
         return taskRepository.save(newTask).toServiceResult()
     }
 
-    fun replaceTask(taskId: Long, request: ReplaceTaskRequest): ServiceResult<Task> {
+    fun replaceTask(taskId: TaskId, request: ReplaceTaskRequest): ServiceResult<Task> {
         val replacementTask = try {
             ReplacementTask(
                 id = taskId,
                 title = request.title,
                 description = request.description,
                 priority = request.priority,
-                assignedTo = request.assignedTo,
+                assignedTo = request.assignedTo?.let { UserId(it) },
                 version = request.version,
             )
         } catch (e: IllegalArgumentException) {
@@ -75,14 +77,14 @@ class TaskService(
         return taskRepository.replace(replacementTask).toServiceResult()
     }
 
-    fun updateTask(taskId: Long, request: UpdateTaskRequest): ServiceResult<Task> {
+    fun updateTask(taskId: TaskId, request: UpdateTaskRequest): ServiceResult<Task> {
         val updatedTask = try {
             UpdatedTask(
                 id = taskId,
                 title = request.title,
                 description = request.description,
                 priority = request.priority,
-                assignedTo = request.assignedTo,
+                assignedTo = request.assignedTo?.let { UserId(it) },
                 version = request.version,
             )
         } catch (e: IllegalArgumentException) {
@@ -92,14 +94,14 @@ class TaskService(
         return taskRepository.update(updatedTask).toServiceResult()
     }
 
-    fun deleteTask(taskId: Long): ServiceResult<Unit> {
+    fun deleteTask(taskId: TaskId): ServiceResult<Unit> {
         return taskRepository.delete(taskId).toServiceResult()
     }
 
     fun transitionTaskStatus(
-        taskId: Long,
+        taskId: TaskId,
         request: TransitionTaskStatusRequest,
-        requestingUserId: Long,
+        requestingUserId: UserId,
         requestingRole: UserRole,
     ): ServiceResult<Task> {
         val savedTask = when (val current = taskRepository.findById(taskId)) {

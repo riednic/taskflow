@@ -37,12 +37,12 @@ data class TaskResponse(
 )
 
 fun Task.toResponse() = TaskResponse(
-    id = id,
+    id = id.value,
     title = title,
     description = description,
     status = status,
     priority = priority,
-    assignedTo = assignedTo,
+    assignedTo = assignedTo?.value,
     version = version,
     createdAt = createdAt,
     updatedAt = updatedAt

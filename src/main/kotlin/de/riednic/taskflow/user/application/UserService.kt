@@ -7,6 +7,7 @@ import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.user.controller.CreateUserRequest
 import de.riednic.taskflow.user.domain.NewUser
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -45,7 +46,7 @@ class UserService(
     }
 
     @Transactional(readOnly = true)
-    fun getUserById(id: Long): ServiceResult<User> {
+    fun getUserById(id: UserId): ServiceResult<User> {
         return userRepository.findById(id).toServiceResult()
     }
 

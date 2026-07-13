@@ -17,6 +17,6 @@ fun TaskFilter.toSpecification(): Specification<TaskEntity> =
     listOfNotNull(
         equal("status", status),
         equal("priority", priority),
-        equal("assignedTo", assignedTo)
+        equal("assignedTo", assignedTo?.value)
     ).reduceOrNull(Specification<TaskEntity>::and)
         ?: Specification { _, _, cb -> cb.conjunction() }

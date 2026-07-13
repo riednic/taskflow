@@ -3,6 +3,7 @@ package de.riednic.taskflow.auth.application
 import de.riednic.taskflow.common.persistence.RepositoryResult
 import de.riednic.taskflow.user.application.UserRepository
 import de.riednic.taskflow.user.domain.User
+import de.riednic.taskflow.user.domain.UserId
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -22,7 +23,7 @@ class AuthUserDetailsService(
     }
 
     fun loadUserById(id: Long): AuthUser {
-        val result = userRepository.findById(id)
+        val result = userRepository.findById(UserId(id))
         if (result !is RepositoryResult.Success) {
             throw UsernameNotFoundException("User with id '$id' not found")
         }
@@ -31,7 +32,7 @@ class AuthUserDetailsService(
     }
 
     private fun User.toAuthUser(): AuthUser = AuthUser(
-        id = id,
+        id = id.value,
         email = email,
         passwordHash = passwordHash,
         role = role,

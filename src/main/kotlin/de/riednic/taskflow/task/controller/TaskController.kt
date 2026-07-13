@@ -5,8 +5,10 @@ import de.riednic.taskflow.common.application.ServiceResult
 import de.riednic.taskflow.common.controller.toResponseEntity
 import de.riednic.taskflow.task.application.TaskService
 import de.riednic.taskflow.task.domain.TaskFilter
+import de.riednic.taskflow.task.domain.TaskId
 import de.riednic.taskflow.task.domain.TaskPriority
 import de.riednic.taskflow.task.domain.TaskStatus
+import de.riednic.taskflow.user.domain.UserId
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -40,7 +42,7 @@ class TaskController(
         @RequestParam(required = false) assignedTo: Long?,
         @PageableDefault(size = 10) pageable: Pageable,
     ): ResponseEntity<Any> {
-        val filter = TaskFilter(status = status, priority = priority, assignedTo = assignedTo)
+        val filter = TaskFilter(status = status, priority = priority, assignedTo = assignedTo?.let { UserId(it) })
         return when (val result = taskService.getTasks(filter, pageable)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.map { it.toResponse() })
             is ServiceResult.Error -> result.toResponseEntity()
@@ -49,7 +51,7 @@ class TaskController(
 
     @GetMapping("/{id}")
     fun getTaskById(@PathVariable id: Long): ResponseEntity<Any> {
-        return when (val result = taskService.getTaskById(id)) {
+        return when (val result = taskService.getTaskById(TaskId(id))) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             is ServiceResult.Error -> result.toResponseEntity()
         }
@@ -76,7 +78,7 @@ class TaskController(
         @PathVariable id: Long,
         @Valid @RequestBody request: ReplaceTaskRequest,
     ): ResponseEntity<Any> {
-        return when (val result = taskService.replaceTask(id, request)) {
+        return when (val result = taskService.replaceTask(TaskId(id), request)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             is ServiceResult.Error -> result.toResponseEntity()
         }
@@ -89,7 +91,7 @@ class TaskController(
         @PathVariable id: Long,
         @Valid @RequestBody request: UpdateTaskRequest,
     ): ResponseEntity<Any> {
-        return when (val result = taskService.updateTask(id, request)) {
+        return when (val result = taskService.updateTask(TaskId(id), request)) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             is ServiceResult.Error -> result.toResponseEntity()
         }
@@ -101,7 +103,9 @@ class TaskController(
         @Valid @RequestBody request: TransitionTaskStatusRequest,
         @AuthenticationPrincipal authUser: AuthUser,
     ): ResponseEntity<Any> {
-        return when (val result = taskService.transitionTaskStatus(id, request, authUser.id, authUser.role)) {
+        return when (
+            val result = taskService.transitionTaskStatus(TaskId(id), request, UserId(authUser.id), authUser.role)
+        ) {
             is ServiceResult.Success -> ResponseEntity.ok(result.value.toResponse())
             is ServiceResult.Error -> result.toResponseEntity()
         }
@@ -112,7 +116,7 @@ class TaskController(
     fun deleteTask(
         @PathVariable id: Long,
     ): ResponseEntity<Any> {
-        return when (val result = taskService.deleteTask(id)) {
+        return when (val result = taskService.deleteTask(TaskId(id))) {
             is ServiceResult.Success -> ResponseEntity.noContent().build()
             is ServiceResult.Error -> result.toResponseEntity()
         }
