@@ -15,6 +15,9 @@ private val possibleTransitions = mapOf(
 fun TaskStatus.isValidTransitionTo(target: TaskStatus): Boolean =
     target in (possibleTransitions[this] ?: emptySet())
 
+val TaskStatus.isTerminal: Boolean
+    get() = possibleTransitions[this]?.isEmpty() ?: true
+
 object TaskStatusTransitionPolicy {
 
     fun isAllowed(role: UserRole, requestingUserId: UserId, task: Task, target: TaskStatus): Boolean {

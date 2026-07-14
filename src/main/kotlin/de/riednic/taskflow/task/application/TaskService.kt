@@ -17,6 +17,7 @@ import de.riednic.taskflow.task.domain.TaskId
 import de.riednic.taskflow.task.domain.TaskStatus
 import de.riednic.taskflow.task.domain.TaskStatusTransitionPolicy
 import de.riednic.taskflow.task.domain.UpdatedTask
+import de.riednic.taskflow.task.domain.isTerminal
 import de.riednic.taskflow.task.domain.isValidTransitionTo
 import de.riednic.taskflow.user.domain.UserId
 import de.riednic.taskflow.user.domain.UserRole
@@ -61,6 +62,16 @@ class TaskService(
     }
 
     fun replaceTask(taskId: TaskId, request: ReplaceTaskRequest): ServiceResult<Task> {
+        val savedTask = when (val current = taskRepository.findById(taskId)) {
+            is RepositoryResult.Error -> return current.toServiceError()
+            is RepositoryResult.Success -> current.value
+        }
+        if (savedTask.status.isTerminal) {
+            return TaskInTerminalStateError(
+                "Task $taskId is in terminal state ${savedTask.status} and can no longer be updated."
+            )
+        }
+
         val replacementTask = try {
             ReplacementTask(
                 id = taskId,
@@ -78,6 +89,16 @@ class TaskService(
     }
 
     fun updateTask(taskId: TaskId, request: UpdateTaskRequest): ServiceResult<Task> {
+        val savedTask = when (val current = taskRepository.findById(taskId)) {
+            is RepositoryResult.Error -> return current.toServiceError()
+            is RepositoryResult.Success -> current.value
+        }
+        if (savedTask.status.isTerminal) {
+            return TaskInTerminalStateError(
+                "Task $taskId is in terminal state ${savedTask.status} and can no longer be updated."
+            )
+        }
+
         val updatedTask = try {
             UpdatedTask(
                 id = taskId,
