@@ -1,0 +1,17 @@
+meta {
+  name: 10 - Get Task By Id - unauthenticated (401)
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

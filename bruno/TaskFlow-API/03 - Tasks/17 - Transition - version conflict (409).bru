@@ -1,0 +1,28 @@
+meta {
+  name: 17 - Transition - version conflict (409)
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{memberToken}}
+}
+
+body:json {
+  {
+    "status": "IN_REVIEW",
+    "version": 999
+  }
+}
+
+tests {
+  test("returns 409 due to a stale version", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

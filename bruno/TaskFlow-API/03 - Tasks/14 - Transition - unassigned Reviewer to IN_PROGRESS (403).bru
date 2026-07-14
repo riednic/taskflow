@@ -1,0 +1,28 @@
+meta {
+  name: 14 - Transition - unassigned Reviewer to IN_PROGRESS (403)
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{reviewerToken}}
+}
+
+body:json {
+  {
+    "status": "IN_PROGRESS",
+    "version": {{taskVersion}}
+  }
+}
+
+tests {
+  test("returns 403, reviewer is not assigned and not admin", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

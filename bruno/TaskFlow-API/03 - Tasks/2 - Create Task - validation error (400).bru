@@ -1,0 +1,27 @@
+meta {
+  name: 2 - Create Task - validation error (400)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "title": ""
+  }
+}
+
+tests {
+  test("returns 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

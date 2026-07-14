@@ -1,0 +1,21 @@
+meta {
+  name: 3 - Get Task Statistics - as Member (403)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/statistics/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{memberToken}}
+}
+
+tests {
+  test("returns 403, statistics are restricted to ADMIN/REVIEWER", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

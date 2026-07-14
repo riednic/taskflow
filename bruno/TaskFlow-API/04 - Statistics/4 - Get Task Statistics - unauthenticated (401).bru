@@ -1,0 +1,17 @@
+meta {
+  name: 4 - Get Task Statistics - unauthenticated (401)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/statistics/tasks
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

@@ -1,0 +1,29 @@
+meta {
+  name: 21 - Replace Task PUT - terminal state conflict (409)
+  type: http
+  seq: 21
+}
+
+put {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "title": "Should not be applied, task is DONE",
+    "priority": "LOW",
+    "version": {{taskVersion}}
+  }
+}
+
+tests {
+  test("returns 409, DONE is a terminal state", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

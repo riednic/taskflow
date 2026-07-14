@@ -1,0 +1,30 @@
+meta {
+  name: 4 - Create User - duplicate email (409)
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "name": "Duplicate Admin",
+    "email": "{{adminEmail}}",
+    "password": "SomePassword123!",
+    "role": "MEMBER"
+  }
+}
+
+tests {
+  test("returns 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

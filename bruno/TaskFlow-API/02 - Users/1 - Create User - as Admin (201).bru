@@ -1,0 +1,35 @@
+meta {
+  name: 1 - Create User - as Admin (201)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+script:pre-request {
+  bru.setVar("adhocEmail", `bruno-adhoc-${Date.now()}@taskflow.local`);
+}
+
+body:json {
+  {
+    "name": "Ad-hoc Test User",
+    "email": "{{adhocEmail}}",
+    "password": "SomePassword123!",
+    "role": "MEMBER"
+  }
+}
+
+tests {
+  test("returns 201", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.body.role).to.equal("MEMBER");
+  });
+}

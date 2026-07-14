@@ -1,0 +1,30 @@
+meta {
+  name: 5 - List Tasks - filter by status and priority (200)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tasks?status=TODO&priority=MEDIUM
+  body: none
+  auth: bearer
+}
+
+params:query {
+  status: TODO
+  priority: MEDIUM
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 200 with only TODO/MEDIUM tasks", function () {
+    expect(res.getStatus()).to.equal(200);
+    res.body.content.forEach((task) => {
+      expect(task.status).to.equal("TODO");
+      expect(task.priority).to.equal("MEDIUM");
+    });
+  });
+}

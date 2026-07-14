@@ -1,0 +1,21 @@
+meta {
+  name: 26 - Delete Task - not found after delete (404)
+  type: http
+  seq: 26
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/tasks/{{deletableTaskId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 404, task was already deleted", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

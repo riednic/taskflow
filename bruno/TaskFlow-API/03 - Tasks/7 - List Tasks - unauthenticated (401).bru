@@ -1,0 +1,17 @@
+meta {
+  name: 7 - List Tasks - unauthenticated (401)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tasks
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

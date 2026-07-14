@@ -1,0 +1,21 @@
+meta {
+  name: 25 - Delete Task - as Admin, no history (204)
+  type: http
+  seq: 25
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/tasks/{{deletableTaskId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 204", function () {
+    expect(res.getStatus()).to.equal(204);
+  });
+}
