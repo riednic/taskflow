@@ -4,6 +4,7 @@ import de.riednic.taskflow.auth.application.AuthUserDetailsService
 import de.riednic.taskflow.auth.application.JwtService
 import de.riednic.taskflow.auth.application.TokenBlocklist
 import de.riednic.taskflow.auth.application.stripBearerPrefix
+import io.jsonwebtoken.JwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -34,17 +35,21 @@ class JwtAuthorizationFilter(
         }
 
         if (SecurityContextHolder.getContext().authentication == null && !tokenBlocklist.isBlacklisted(token)) {
-            val userId = jwtService.extractUserId(token)
-            val authUser = authUserDetailsService.loadUserById(userId)
+            try {
+                val userId = jwtService.extractUserId(token)
+                val authUser = authUserDetailsService.loadUserById(userId)
 
-            if (jwtService.isValid(token, authUser)) {
-                val authentication = UsernamePasswordAuthenticationToken(
-                    authUser,
-                    null,
-                    authUser.authorities,
-                )
-                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = authentication
+                if (jwtService.isValid(token, authUser)) {
+                    val authentication = UsernamePasswordAuthenticationToken(
+                        authUser,
+                        null,
+                        authUser.authorities,
+                    )
+                    authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+                    SecurityContextHolder.getContext().authentication = authentication
+                }
+            } catch (_: JwtException) {
+                // Malformed, expired or tampered token: leave the request unauthenticated.
             }
         }
 

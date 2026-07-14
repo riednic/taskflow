@@ -1,6 +1,7 @@
 package de.riednic.taskflow.auth.application
 
 import io.jsonwebtoken.Claims
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
@@ -36,7 +37,11 @@ class JwtService(
     }
 
     fun isValid(token: String, authUser: AuthUser): Boolean {
-        val claims = extractAllClaims(token)
+        val claims = try {
+            extractAllClaims(token)
+        } catch (_: JwtException) {
+            return false
+        }
         return claims.subject == authUser.id.toString() && claims.expiration.after(Date())
     }
 
