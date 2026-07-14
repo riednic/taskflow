@@ -20,7 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Validated
 @RestController
-@RequestMapping("/users")
+@RequestMapping("api/v1/users")
 class UserController(
     private val userService: UserService,
 ) {
