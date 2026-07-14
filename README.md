@@ -174,6 +174,39 @@ All database changes are managed through migration files.
 
 ---
 
+# Initial Admin Seeding
+
+The first `ADMIN` user is created automatically at application startup by `AdminUserSeeder`
+(`user/application/AdminUserSeeder.kt`), a Spring `ApplicationRunner` that runs once Flyway
+migrations have completed.
+
+On every startup it checks whether a user with role `ADMIN` already exists:
+
+- If **no** admin exists yet, it creates one from the `ADMIN_NAME`, `ADMIN_EMAIL` and
+  `ADMIN_PASSWORD` environment variables (see `.env.example`), hashing the password with the
+  same `BCryptPasswordEncoder` used for regular user registration.
+- If an admin **already** exists, it does nothing.
+
+This makes seeding idempotent: restarts and redeploys never duplicate or reset the admin
+account, even though the runner executes on every boot.
+
+Credentials are configured exclusively via environment variables — never hardcoded, never
+committed. Set `ADMIN_NAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` in your `.env` (or the
+deployment's secret store) before the first start; `ADMIN_PASSWORD` in particular should be
+changed from the `.env.example` placeholder.
+
+## Why not seed via a Flyway migration?
+
+Postgres' `pgcrypto` extension can compute a real BCrypt hash directly in SQL
+(`crypt(password, gen_salt('bf'))`), so a migration-based seed was considered. It was rejected
+because Flyway placeholder substitution is a naive string replace, not a parameterized query — a
+password containing a `'` would break out of the SQL string literal (or worse). Seeding via
+application code instead reuses the exact same validated path as regular user creation (`NewUser`
+validation, `BCryptPasswordEncoder`, unique-email constraint handling) with no string-interpolated
+secrets.
+
+---
+
 # Local Development Setup
 
 ## Requirements
@@ -192,6 +225,9 @@ Copy the example env file and adjust values if needed (defaults work out of the 
 ```bash
 cp .env.example .env
 ```
+
+Make sure to change `ADMIN_PASSWORD` from its placeholder value — it becomes the initial admin
+account's password on first startup (see [Initial Admin Seeding](#initial-admin-seeding)).
 
 ---
 
