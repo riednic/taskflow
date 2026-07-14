@@ -1,7 +1,5 @@
-package de.riednic.taskflow.auth.config
+package de.riednic.taskflow.auth.application
 
-import de.riednic.taskflow.auth.application.AuthUserDetailsService
-import de.riednic.taskflow.auth.application.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
