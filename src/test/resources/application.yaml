@@ -5,3 +5,7 @@ app:
   jwt:
     secret: tP7goeB99+RA8dppaE7VVkudFdmn/47vwKCN5ukjGEs=
     expiration-seconds: 3600
+  admin:
+    name: Admin
+    email: admin@taskflow.test
+    password: test-admin-password
