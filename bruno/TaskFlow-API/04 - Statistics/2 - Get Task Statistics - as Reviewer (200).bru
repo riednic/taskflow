@@ -1,0 +1,21 @@
+meta {
+  name: 2 - Get Task Statistics - as Reviewer (200)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/v1/statistics/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{reviewerToken}}
+}
+
+tests {
+  test("returns 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}

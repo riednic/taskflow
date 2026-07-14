@@ -1,0 +1,35 @@
+meta {
+  name: 24 - Create Task for deletion (201)
+  type: http
+  seq: 24
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "title": "Task with no history, safe to delete",
+    "status": "TODO",
+    "priority": "LOW"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("deletableTaskId", res.body.id);
+  }
+}
+
+tests {
+  test("returns 201", function () {
+    expect(res.getStatus()).to.equal(201);
+  });
+}

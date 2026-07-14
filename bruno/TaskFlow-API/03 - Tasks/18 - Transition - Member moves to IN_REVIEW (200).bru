@@ -1,0 +1,35 @@
+meta {
+  name: 18 - Transition - Member moves to IN_REVIEW (200)
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{memberToken}}
+}
+
+body:json {
+  {
+    "status": "IN_REVIEW",
+    "version": {{taskVersion}}
+  }
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("taskVersion", res.body.version);
+  }
+}
+
+tests {
+  test("returns 200, triggers the async reviewer notification", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.body.status).to.equal("IN_REVIEW");
+  });
+}

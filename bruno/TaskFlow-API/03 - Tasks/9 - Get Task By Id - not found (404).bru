@@ -1,0 +1,21 @@
+meta {
+  name: 9 - Get Task By Id - not found (404)
+  type: http
+  seq: 9
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tasks/999999999
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

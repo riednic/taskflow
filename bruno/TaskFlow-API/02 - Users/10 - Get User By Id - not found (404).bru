@@ -1,0 +1,21 @@
+meta {
+  name: 10 - Get User By Id - not found (404)
+  type: http
+  seq: 10
+}
+
+get {
+  url: {{baseUrl}}/api/v1/users/999999999
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 404", function () {
+    expect(res.getStatus()).to.equal(404);
+  });
+}

@@ -1,0 +1,28 @@
+meta {
+  name: 16 - Transition - invalid transition to DONE (409)
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}/status
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "status": "DONE",
+    "version": {{taskVersion}}
+  }
+}
+
+tests {
+  test("returns 409, IN_PROGRESS cannot jump straight to DONE", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

@@ -1,0 +1,24 @@
+meta {
+  name: 2 - Login - validation error (400)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "not-an-email",
+    "password": ""
+  }
+}
+
+tests {
+  test("returns 400", function () {
+    expect(res.getStatus()).to.equal(400);
+  });
+}

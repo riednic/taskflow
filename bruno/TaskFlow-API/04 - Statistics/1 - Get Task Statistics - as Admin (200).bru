@@ -1,0 +1,24 @@
+meta {
+  name: 1 - Get Task Statistics - as Admin (200)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/statistics/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 200 with the statistics shape", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.body).to.have.property("countsByStatus");
+    expect(res.body).to.have.property("averageTodoToDoneHours");
+    expect(res.body).to.have.property("topUsersByCompletedTasks");
+  });
+}

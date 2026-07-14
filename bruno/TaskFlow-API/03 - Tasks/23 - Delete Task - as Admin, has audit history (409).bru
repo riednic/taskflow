@@ -1,0 +1,21 @@
+meta {
+  name: 23 - Delete Task - as Admin, has audit history (409)
+  type: http
+  seq: 23
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 409, task is still referenced by its status transition audit log", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

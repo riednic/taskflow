@@ -1,0 +1,29 @@
+meta {
+  name: 12 - Replace Task PUT - version conflict (409)
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "title": "Stale replace attempt",
+    "priority": "LOW",
+    "version": 0
+  }
+}
+
+tests {
+  test("returns 409", function () {
+    expect(res.getStatus()).to.equal(409);
+  });
+}

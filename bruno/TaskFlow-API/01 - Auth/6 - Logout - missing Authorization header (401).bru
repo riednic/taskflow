@@ -1,0 +1,17 @@
+meta {
+  name: 6 - Logout - missing Authorization header (401)
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/logout
+  body: none
+  auth: none
+}
+
+tests {
+  test("returns 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

@@ -1,0 +1,21 @@
+meta {
+  name: 22 - Delete Task - as Member (403)
+  type: http
+  seq: 22
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{memberToken}}
+}
+
+tests {
+  test("returns 403, only ADMIN may delete tasks", function () {
+    expect(res.getStatus()).to.equal(403);
+  });
+}

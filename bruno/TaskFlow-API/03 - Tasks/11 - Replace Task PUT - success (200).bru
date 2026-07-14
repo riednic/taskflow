@@ -1,0 +1,38 @@
+meta {
+  name: 11 - Replace Task PUT - success (200)
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/api/v1/tasks/{{taskId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "title": "Bruno workflow task (replaced)",
+    "description": "Replaced via PUT",
+    "priority": "HIGH",
+    "assignedTo": {{memberId}},
+    "version": {{taskVersion}}
+  }
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("taskVersion", res.body.version);
+  }
+}
+
+tests {
+  test("returns 200 with the replaced task", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.body.priority).to.equal("HIGH");
+  });
+}

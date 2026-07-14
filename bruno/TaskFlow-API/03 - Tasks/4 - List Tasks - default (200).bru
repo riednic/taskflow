@@ -1,0 +1,22 @@
+meta {
+  name: 4 - List Tasks - default (200)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/v1/tasks
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+tests {
+  test("returns 200 with a page of tasks", function () {
+    expect(res.getStatus()).to.equal(200);
+    expect(res.body.content).to.be.an("array");
+  });
+}

@@ -1,0 +1,37 @@
+meta {
+  name: 3 - Create Reviewer User
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "name": "Bruno Reviewer",
+    "email": "{{reviewerEmail}}",
+    "password": "{{reviewerPassword}}",
+    "role": "REVIEWER"
+  }
+}
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("reviewerId", res.body.id);
+  }
+}
+
+tests {
+  test("creates the reviewer user", function () {
+    expect(res.getStatus()).to.equal(201);
+    expect(res.body.role).to.equal("REVIEWER");
+  });
+}

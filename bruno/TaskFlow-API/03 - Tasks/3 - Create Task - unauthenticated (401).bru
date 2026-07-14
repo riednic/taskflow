@@ -1,0 +1,25 @@
+meta {
+  name: 3 - Create Task - unauthenticated (401)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/tasks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Should not be created",
+    "status": "TODO",
+    "priority": "LOW"
+  }
+}
+
+tests {
+  test("returns 401", function () {
+    expect(res.getStatus()).to.equal(401);
+  });
+}

@@ -1,0 +1,30 @@
+meta {
+  name: 3 - Login for logout test
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/v1/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{adminEmail}}",
+    "password": "{{adminPassword}}"
+  }
+}
+
+script:post-response {
+  if (res.status === 200) {
+    bru.setEnvVar("logoutTestToken", res.body.token);
+  }
+}
+
+tests {
+  test("returns 200 with a token", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+}
