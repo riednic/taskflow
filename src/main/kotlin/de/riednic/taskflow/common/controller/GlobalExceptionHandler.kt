@@ -3,6 +3,7 @@ package de.riednic.taskflow.common.controller
 import org.hibernate.exception.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -19,6 +20,10 @@ class GlobalExceptionHandler {
             "VALIDATION_ERROR",
             ex.bindingResult.fieldErrors.joinToString("; ") { "${it.field}: ${it.defaultMessage}" },
         )
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException): ResponseEntity<Any> =
+        errorEntity(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Malformed or incomplete request body.")
 
     @ExceptionHandler(HandlerMethodValidationException::class)
     fun handleHandlerMethodValidation(ex: HandlerMethodValidationException): ResponseEntity<Any> =

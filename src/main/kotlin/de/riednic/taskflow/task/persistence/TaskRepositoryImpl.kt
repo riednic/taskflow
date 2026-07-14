@@ -106,6 +106,10 @@ class TaskRepositoryImpl(
             unexpectedErrorMessage = "Unexpected error while deleting task.",
         ) {
             springDataTaskRepository.deleteById(id.value)
+            // Force the DELETE to execute now, inside this try/catch: without an explicit flush,
+            // Hibernate defers it to transaction commit, where a foreign key violation (the task
+            // still has audit log entries) would escape as an unhandled 500 instead of a 409.
+            springDataTaskRepository.flush()
             RepositoryResult.Ok(Unit)
         }
     }
