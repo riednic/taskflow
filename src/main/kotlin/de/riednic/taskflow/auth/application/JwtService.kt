@@ -31,6 +31,10 @@ class JwtService(
         return extractAllClaims(token).subject.toLong()
     }
 
+    fun extractExpiration(token: String): Instant {
+        return extractAllClaims(token).expiration.toInstant()
+    }
+
     fun isValid(token: String, authUser: AuthUser): Boolean {
         val claims = extractAllClaims(token)
         return claims.subject == authUser.id.toString() && claims.expiration.after(Date())
